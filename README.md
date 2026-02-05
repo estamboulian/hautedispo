@@ -26,8 +26,21 @@ Haute Dispo/
 
 6 directories, 15 files
 ```
+### Topologie Réseau
+* 3 Control-Plane :
+  - CP 1 : 10.1.10.66
+  - CP 2 : 10.1.10.67
+  - CP 3 : 10.1.10.69
 
-### Schéma Réseaux de notre Infrastructure
+* 2 Workers :
+  - Worker 1 : 10.1.10.65
+  - Worker 2 : 10.1.10.68
+
+* HA Proxy :
+  - IP : 10.1.10.63
+  - VIP : 10.1.10.7
+
+### Schéma Réseau de notre Infrastructure
 [Image]
 ---
 
