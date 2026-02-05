@@ -1,5 +1,6 @@
 Conf haproxy:
 
+'''
 global
         log /dev/log    local0
         log /dev/log    local1 notice
@@ -50,13 +51,14 @@ backend k8s-masters
     server cp1 10.1.10.66:6443 check
     server cp2 10.1.10.67:6443 check
     server cp3 10.1.10.69:6443 check
-
+''' 
 
 
 
 
 Keepalive:
 
+'''
 # Script pour vérifier si HAProxy est vivant
 vrrp_script chk_haproxy {
     script "killall -0 haproxy" # Vérifie si le processus existe
@@ -86,7 +88,7 @@ vrrp_instance VI_1 {
         chk_haproxy
     }
 }
-
+'''
 
 Architecture:
 
