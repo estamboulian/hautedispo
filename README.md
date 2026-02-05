@@ -97,4 +97,35 @@ Pour permettre aux pods de se déplacer librement entre les nœuds tout en conse
     * **Haute Disponibilité :** Configuration de **2 réplicas** pour assurer la continuité de service en cas de défaillance d'une instance.
     * **Exposition :** Utilisation d'un service **NodePort** sur le port **31803**, rendant le site accessible depuis l'extérieur.
     * **Liaison (Labels) :** Utilisation de sélecteurs d'étiquettes pour créer un écosystème cohérent où le stockage, la base de données et le serveur web se reconnaissent mutuellement.
+---
+
+## 5. Gestion du Cycle de Vie : Procédure de Mise à Jour
+La mise à jour du cluster (via `kubeadm`) est une opération critique réalisée selon une méthodologie "Node-by-Node" pour garantir la disponibilité du site.
+
+### 5.1 Mesures de Sécurité (Backup)
+Avant toute action, nous procédons à une sauvegarde du cerveau du cluster (Etcd) :
+```bash
+ETCDCTL_API=3 etcdctl snapshot save snapshot.db \
+  --endpoints=[https://127.0.0.1:2379](https://127.0.0.1:2379) \
+  --cacert=/etc/kubernetes/pki/etcd/ca.crt \
+  --cert=/etc/kubernetes/pki/etcd/server.crt \
+  --key=/etc/kubernetes/pki/etcd/server.key
+```
+
+### 5.2 Séquence de Mise à Jour
+1. **Control Plane :** Mise à jour séquentielle des Masters. On applique `kubeadm upgrade apply` sur le premier, puis `upgrade node` sur les suivants.
+2. **Workers :** * Drainage : `kubectl drain <node>` pour déplacer les Pods en douceur.
+* **Update :** Mise à jour des paquets `kubeadm`, `kubelet` et `kubectl`.
+* **Réintégration :** `kubectl uncordon` pour remettre le nœud en service.
+
+### 5.3 Validation Post-Update
+
+* Vérification que tous les nœuds sont en `Ready` via `kubectl get nodes`.
+* Test d'accès final sur l'URL du service pour confirmer l'intégrité du site WordPress.
+
+---
+## 6. Auteurs
+* **Édouard Stamboulian** — [GitHub de Édouard](https://github.com/estamboulian)  
+* **Ahmed Khairi** — [GitHub de Ahmed](https://github.com/hirlho)  
+
 
