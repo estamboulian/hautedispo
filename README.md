@@ -1,7 +1,31 @@
 # Rapport de Projet : Infrastructure Kubernetes Haute Disponibilité (HA)
 
 ## 1. Architecture du Projet
+```
+Haute Dispo/
+├── HostPath
+│   ├── 01-storage.yaml
+│   ├── 02-mysql.yaml
+│   └── 03-wordpress.yaml
+└── NFS
+    ├── mysql
+    │   ├── mysql1.yaml
+    │   ├── mysql-final.yaml
+    │   ├── mysql-sc.yaml
+    │   ├── mysql-svc.yaml
+    │   └── mysql.yaml
+    ├── nfs-sc.yml
+    ├── storage
+    │   ├── pvc.yaml
+    │   ├── pv.yaml
+    │   └── storage.yaml
+    └── wordpress
+        ├── wordpress-final.yaml
+        ├── wp-svc.yaml
+        └── wp.yaml
 
+6 directories, 15 files
+```
 
 ### Schéma Réseaux de notre Infrastructure
 [Image]
