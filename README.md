@@ -56,9 +56,21 @@ Pour permettre aux pods de se déplacer librement entre les nœuds tout en conse
 ### Déploiement du Wordpress avec NFS
 
 ###  Déploiement du Wordpress avec HostPath
-Après avoir testé la solution NFS, nous avons rapidement réalisé que dans un environnement de TP ou sur des serveurs aux performances d'écriture limitées, le stockage réseau pouvait devenir un goulot d'étranglement. Nous avons donc basculé sur une stratégie en HostPath.
+* **Transition vers le HostPath :**
+    * **Stabilité accrue :** Le choix du **HostPath** a été privilégié pour garantir une performance d'accès direct au disque (I/O) et éliminer les erreurs de montage réseau.
 
-L'ensemble de notre déploiement s'articule autour de trois fichiers YAML structurés, qui forment la colonne vertébrale de l'infrastructure. Le premier, 01-storage.yaml, définit la couche de persistance : il déclare les PersistentVolumes (PV) qui pointent vers nos dossiers locaux et les PersistentVolumeClaims (PVC) qui agissent comme des "bons de commande" pour l'application. Cette séparation permet de détacher l'application du stockage physique ; même si le Pod est supprimé, le PVC conserve le lien vers les données sur le disque, garantissant qu'aucune configuration WordPress ou table MySQL ne soit perdue.
+* **01-storage.yaml (La couche de persistance) :**
+    * **PersistentVolumes (PV) :** Définition des volumes physiques pointant vers les dossiers locaux sécurisés du nœud.
+    * **PersistentVolumeClaims (PVC) :** Création des "bons de commande" qui permettent aux Pods de réclamer leur espace de stockage.
+    * **Indépendance des données :** Cette structure garantit que les fichiers WordPress et les tables MySQL survivent même si les Pods sont supprimés ou déplacés.
 
-Viennent ensuite les fichiers 02-mysql.yaml et 03-wordpress.yaml, qui gèrent respectivement la base de données et le serveur web. Chaque fichier combine un Service pour la communication réseau et un Deployment pour la gestion des containers. Dans le fichier MySQL, nous avons configuré les variables d'environnement pour l'initialisation de la base, tandis que le fichier WordPress définit nos deux réplicas et l'exposition en NodePort sur le port 31803. Le lien entre ces trois fichiers est assuré par les sélecteurs de labels, créant un écosystème où chaque composant se reconnaît et communique automatiquement dès son apparition dans le cluster.
+* **02-mysql.yaml (Le socle de données) :**
+    * **Déploiement :** Gestion du moteur MySQL 8.0 avec une configuration optimisée pour la persistance.
+    * **Variables d'environnement :** Automatisation de l'initialisation de la base de données (nom, utilisateur et mot de passe).
+    * **Service :** Mise en place d'un point d'accès interne stable pour que WordPress puisse contacter la base sans se soucier de l'IP changeante du Pod.
+
+* **03-wordpress.yaml (Le serveur applicatif) :**
+    * **Haute Disponibilité :** Configuration de **2 réplicas** pour assurer la continuité de service en cas de défaillance d'une instance.
+    * **Exposition :** Utilisation d'un service **NodePort** sur le port **31803**, rendant le site accessible depuis l'extérieur.
+    * **Liaison (Labels) :** Utilisation de sélecteurs d'étiquettes pour créer un écosystème cohérent où le stockage, la base de données et le serveur web se reconnaissent mutuellement.
 
