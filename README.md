@@ -114,7 +114,7 @@ ETCDCTL_API=3 etcdctl snapshot save snapshot.db \
 
 ### 5.2 Séquence de Mise à Jour
 1. **Control Plane :** Mise à jour séquentielle des Masters. On applique `kubeadm upgrade apply` sur le premier, puis `upgrade node` sur les suivants.
-2. **Workers :** * Drainage : `kubectl drain <node>` pour déplacer les Pods en douceur.
+2. **Workers :**  **Drainage** : `kubectl drain <node>` pour déplacer les Pods en douceur.
 * **Update :** Mise à jour des paquets `kubeadm`, `kubelet` et `kubectl`.
 * **Réintégration :** `kubectl uncordon` pour remettre le nœud en service.
 
