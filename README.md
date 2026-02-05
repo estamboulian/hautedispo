@@ -1,4 +1,4 @@
-# Rapport de Projet : Infrastructure Kubernetes Haute Disponibilité (HA)
+# Rapport de Projet : Projet Installation H/A d'un Cluster Kubernetes
 
 ## 1. Architecture du Projet
 ```
