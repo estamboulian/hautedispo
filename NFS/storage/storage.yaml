@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-mysql-final
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes: [ReadWriteMany]
+  storageClassName: nfs
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: 10.1.10.66
+    path: /srv/nfs/k8s/mysql
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc-final
+  namespace: wordpress-ha
+spec:
+  accessModes: [ReadWriteMany]
+  storageClassName: nfs
+  resources:
+    requests:
+      storage: 5Gi
+  volumeName: pv-mysql-final

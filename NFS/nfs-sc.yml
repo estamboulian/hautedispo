@@ -1,0 +1,12 @@
+  apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: nfs
+provisioner: fuseim.pri/ifs  # On utilisera nfs-client provisioner
+parameters:
+  server: 10.1.10.66          # IP du serveur NFS
+  path: /srv/nfs/k8s
+reclaimPolicy: Delete
+mountOptions:
+  - vers=4.1
+

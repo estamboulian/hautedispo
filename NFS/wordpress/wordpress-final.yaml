@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordpress
+  namespace: wordpress-ha
+spec:
+  replicas: 2 # Tes 2 replicas demandés
+  selector:
+    matchLabels:
+      app: wordpress
+  template:
+    metadata:
+      labels:
+        app: wordpress
+    spec:
+      containers:
+      - image: wordpress:latest
+        name: wordpress
+        env:
+        - name: WORDPRESS_DB_HOST
+          value: mysql # Doit correspondre au nom du service mysql
+        - name: WORDPRESS_DB_PASSWORD
+          value: "votre_mdp_root"
+        - name: WORDPRESS_DB_USER
+          value: root
+        ports:
+        - containerPort: 80
+          name: wordpress
