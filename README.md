@@ -98,9 +98,9 @@ Le stockage de l’application repose sur un serveur NFS centralisé, qui expose
 
 Sur le serveur NFS, une arborescence dédiée à Kubernetes est créée, par exemple :
 
-    * /srv/nfs/k8s/mysql : stockage des données MySQL
+    /srv/nfs/k8s/mysql : stockage des données MySQL
 
-    * /srv/nfs/k8s/wordpress : stockage des fichiers WordPress (thèmes, plugins, médias)
+    /srv/nfs/k8s/wordpress : stockage des fichiers WordPress (thèmes, plugins, médias)
 
 Ces répertoires sont exportés via NFS avec des droits permettant la lecture et l’écriture depuis les nœuds du cluster. Chaque Pod peut ainsi monter ces dossiers comme s’il s’agissait d’un disque local.
 
@@ -123,7 +123,7 @@ Les PersistentVolumeClaims permettent aux Pods de demander un espace de stockage
     * capacité,
     * mode d’accès (RWX),
     * classe de stockage.
-* Kubernetes associe automatiquement chaque PVC au PV correspondant.
+Kubernetes associe automatiquement chaque PVC au PV correspondant.
 
 Cette approche rend le déploiement modulaire et réutilisable, tout en simplifiant la gestion du stockage.
 
@@ -133,9 +133,9 @@ Cette approche rend le déploiement modulaire et réutilisable, tout en simplifi
     * Les données MySQL restent disponibles même après un redémarrage du Pod.
     * Les fichiers WordPress sont partagés entre toutes les instances de l’application.
     * Les mises à jour (upload de médias, installation de plugins) sont immédiatement visibles sur tous les Pods WordPress.
-* Cette architecture garantit la continuité du service, la cohérence des données et facilite la montée en charge de l’application.
+  Cette architecture garantit la continuité du service, la cohérence des données et facilite la montée en charge de l’application.
 
-* **Mysql**
+#### Mysql
 * **Déploiement MySQL :**
     * MySQL est déployé avec un **seul réplica**, afin d’éviter les conflits d’accès disque (notamment les verrous InnoDB) sur un stockage NFS partagé.
 
@@ -151,7 +151,7 @@ Cette approche rend le déploiement modulaire et réutilisable, tout en simplifi
 * **Gestion des secrets MySQL :**
     * Les informations **sensibles** de la base de données (mot de passe root, utilisateur et mot de passe applicatif) sont stockées dans des Secrets Kubernetes. Cette approche garantit la protection des identifiants, évite leur exposition en clair dans les fichiers de      déploiement et permet une configuration sécurisée et centralisée des Pods MySQL et WordPress.
 
-* **Wordpress**
+#### Wordpress
 * **Déploiement WordPress :**
     * WordPress est déployé avec **plusieurs réplicas**, ce qui permet d’assurer une haute disponibilité de l’application.
 
