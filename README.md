@@ -119,7 +119,7 @@ Les PV agissent comme une abstraction du stockage physique, évitant toute dépe
 
 Les PersistentVolumeClaims permettent aux Pods de demander un espace de stockage sans connaître les détails du serveur NFS :
 
-Les PVC réclament un volume compatible en termes de :
+* Les PVC réclament un volume compatible en termes de :
     * capacité,
     * mode d’accès (RWX),
     * classe de stockage.
@@ -129,7 +129,7 @@ Cette approche rend le déploiement modulaire et réutilisable, tout en simplifi
 
 * **Persistance et cohérence des données**
 
-Grâce au NFS :
+* Grâce au NFS :
     * Les données MySQL restent disponibles même après un redémarrage du Pod.
     * Les fichiers WordPress sont partagés entre toutes les instances de l’application.
     * Les mises à jour (upload de médias, installation de plugins) sont immédiatement visibles sur tous les Pods WordPress.
