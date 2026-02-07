@@ -92,18 +92,18 @@ Pour permettre aux pods de se déplacer librement entre les nœuds tout en conse
 ## 4. Déploiement de l'Application
 ### Déploiement du Wordpress avec NFS
 
-* **Nfs**
 * **Mise en place du stockage NFS**
 
 Le stockage de l’application repose sur un serveur NFS centralisé, qui expose des répertoires partagés accessibles depuis l’ensemble des nœuds du cluster Kubernetes (Control Plane et Workers).
 
 Sur le serveur NFS, une arborescence dédiée à Kubernetes est créée, par exemple :
 
-    * ```/srv/nfs/k8s/mysql : stockage des données MySQL```
+    * /srv/nfs/k8s/mysql : stockage des données MySQL
 
-    * ```/srv/nfs/k8s/wordpress : stockage des fichiers WordPress (thèmes, plugins, médias)```
+    * /srv/nfs/k8s/wordpress : stockage des fichiers WordPress (thèmes, plugins, médias)
 
 Ces répertoires sont exportés via NFS avec des droits permettant la lecture et l’écriture depuis les nœuds du cluster. Chaque Pod peut ainsi monter ces dossiers comme s’il s’agissait d’un disque local.
+
 * **PersistentVolumes (PV)**
 * Les PersistentVolumes définissent le lien entre Kubernetes et le serveur NFS :
 * Chaque PV référence :
@@ -113,8 +113,53 @@ Ces répertoires sont exportés via NFS avec des droits permettant la lecture et
     * la capacité logique allouée.
 
 Le mode d’accès ReadWriteMany (RWX) est utilisé, ce qui permet à plusieurs Pods de monter simultanément le même volume, un point essentiel pour WordPress en haute disponibilité.
-
 Les PV agissent comme une abstraction du stockage physique, évitant toute dépendance à un nœud spécifique.
+
+* **PersistentVolumeClaims (PVC)**
+
+Les PersistentVolumeClaims permettent aux Pods de demander un espace de stockage sans connaître les détails du serveur NFS :
+
+Les PVC réclament un volume compatible en termes de :
+    * capacité,
+    * mode d’accès (RWX),
+    * classe de stockage.
+* Kubernetes associe automatiquement chaque PVC au PV correspondant.
+
+Cette approche rend le déploiement modulaire et réutilisable, tout en simplifiant la gestion du stockage.
+
+* **Persistance et cohérence des données**
+
+Grâce au NFS :
+    * Les données MySQL restent disponibles même après un redémarrage du Pod.
+    * Les fichiers WordPress sont partagés entre toutes les instances de l’application.
+    * Les mises à jour (upload de médias, installation de plugins) sont immédiatement visibles sur tous les Pods WordPress.
+* Cette architecture garantit la continuité du service, la cohérence des données et facilite la montée en charge de l’application.
+
+* **Mysql**
+* **Déploiement MySQL :**
+    * MySQL est déployé avec un **seul réplica**, afin d’éviter les conflits d’accès disque (notamment les verrous InnoDB) sur un stockage NFS partagé.
+
+* **Stockage persistant :**
+    * Les données de la base sont stockées sur un volume NFS dédié, assurant leur conservation indépendamment du cycle de vie du Pod.
+
+* **Variables d’environnement :**
+    * L’initialisation automatique de la base de données (nom de la base, utilisateur, mot de passe) est gérée via des variables d’environnement.
+
+* **Service interne :**
+    * Un service Kubernetes de type ClusterIP fournit un point d’accès stable à MySQL, permettant à WordPress de s’y connecter sans dépendre de l’adresse IP du Pod
+
+* **Gestion des secrets MySQL :**
+    * Les informations **sensibles** de la base de données (mot de passe root, utilisateur et mot de passe applicatif) sont stockées dans des Secrets Kubernetes. Cette approche garantit la protection des identifiants, évite leur exposition en clair dans les fichiers de      déploiement et permet une configuration sécurisée et centralisée des Pods MySQL et WordPress.
+
+* **Wordpress**
+* **Déploiement WordPress :**
+    * WordPress est déployé avec **plusieurs réplicas**, ce qui permet d’assurer une haute disponibilité de l’application.
+
+* **Stockage partagé via NFS :**
+    * Les fichiers WordPress sont montés depuis un volume NFS commun, garantissant que tous les Pods utilisent exactement les mêmes données (extensions, thèmes, fichiers médias).
+
+* **Exposition du service :**
+    * L’application est rendue accessible depuis l’extérieur du cluster à l’aide d’un service de type NodePort, permettant aux utilisateurs d’accéder au site web via un port fixe.
 
 ###  Déploiement du Wordpress avec HostPath
 * **Transition vers le HostPath :**
