@@ -92,6 +92,30 @@ Pour permettre aux pods de se déplacer librement entre les nœuds tout en conse
 ## 4. Déploiement de l'Application
 ### Déploiement du Wordpress avec NFS
 
+* **Nfs**
+* **Mise en place du stockage NFS**
+
+Le stockage de l’application repose sur un serveur NFS centralisé, qui expose des répertoires partagés accessibles depuis l’ensemble des nœuds du cluster Kubernetes (Control Plane et Workers).
+
+Sur le serveur NFS, une arborescence dédiée à Kubernetes est créée, par exemple :
+
+    * ```/srv/nfs/k8s/mysql : stockage des données MySQL```
+
+    * ```/srv/nfs/k8s/wordpress : stockage des fichiers WordPress (thèmes, plugins, médias)```
+
+Ces répertoires sont exportés via NFS avec des droits permettant la lecture et l’écriture depuis les nœuds du cluster. Chaque Pod peut ainsi monter ces dossiers comme s’il s’agissait d’un disque local.
+* **PersistentVolumes (PV)**
+* Les PersistentVolumes définissent le lien entre Kubernetes et le serveur NFS :
+* Chaque PV référence :
+    * l’adresse IP du serveur NFS,
+    * le chemin exact du répertoire exporté,
+    * le type de stockage (nfs),
+    * la capacité logique allouée.
+
+Le mode d’accès ReadWriteMany (RWX) est utilisé, ce qui permet à plusieurs Pods de monter simultanément le même volume, un point essentiel pour WordPress en haute disponibilité.
+
+Les PV agissent comme une abstraction du stockage physique, évitant toute dépendance à un nœud spécifique.
+
 ###  Déploiement du Wordpress avec HostPath
 * **Transition vers le HostPath :**
     * **Stabilité accrue :** Le choix du **HostPath** a été privilégié pour garantir une performance d'accès direct au disque (I/O) et éliminer les erreurs de montage réseau.
