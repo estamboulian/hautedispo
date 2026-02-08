@@ -41,7 +41,7 @@ Haute Dispo/
   - VIP : 10.1.10.7
 
 ### Schéma Réseau de notre Infrastructure
-[Image]
+![Schéma Réseau](schema_k8s.svg)
 ---
 
 ## 2. Architecture Réseau & Haute Disponibilité
